@@ -1,0 +1,14 @@
+[
+  {
+    "Id": 1,
+    "AccountId": 1,
+    "Amount": 10,
+    "BalanceAtBeforeTransaction": 0,
+    "CapitalizationEvent": false,
+    "CreatedAt": "2024-07-09T19:01:32.8919742-03:00",
+    "Description": "Balada",
+    "TransactionDate": "2024-06-02T00:00:00Z",
+    "TransactionTypeId": null,
+    "TransferenceBetweenAccounts": false
+  }
+]

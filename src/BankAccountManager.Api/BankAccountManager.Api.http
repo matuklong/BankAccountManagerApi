@@ -1,0 +1,40 @@
+@BankAccountManager.Api_HostAddress = http://localhost:5057
+
+GET {{BankAccountManager.Api_HostAddress}}/account
+Accept: application/json
+
+###
+
+POST {{BankAccountManager.Api_HostAddress}}/account
+Content-Type: application/json
+
+{
+    "accountNumber": "7068/00059-0",
+    "accountHolder": "341 - Banco Itaú",
+    "description": "Poupança"
+}
+###
+
+GET {{BankAccountManager.Api_HostAddress}}/transaction?accountId=1&startTransactionDate=2024-06-01
+Accept: application/json
+
+###
+
+POST {{BankAccountManager.Api_HostAddress}}/transaction
+Content-Type: application/json
+
+[
+  {
+    "accountId": 1,
+    "amount": 25,
+    "transactionDate": "2024-06-03T00:00:00Z",
+    "description": "Balada",
+    "capitalizationEvent": false,
+    "transferenceBetweenAccounts": false,
+    "transactionAmountType": 0
+  }
+]
+###
+
+DELETE {{BankAccountManager.Api_HostAddress}}/transaction?accountId=1&transactionId=2
+Accept: application/json
