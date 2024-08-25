@@ -14,4 +14,5 @@ public interface ITransactionService
 
     public Task<List<TransactionModel>> GetTransactions(AccountModel account, DateTime startTransactionDate);
     public Task DeleteTransaction(AccountModel account, int transactionId);
+    Task<TransactionModel?> UpdateTransactionType(int transactionId, int transactionTypeId);
 }

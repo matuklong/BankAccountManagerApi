@@ -27,16 +27,18 @@ public static class ApiDependecyInjection
         {
             // options.UseSqlServer("Server=localhost;Database=BankAccountManager;Trusted_Connection=True;");
             // options.UseFileContextDatabase();
-            options.UseFileBaseContextDatabase(location: "C:\\Users\\bruno\\Documents\\dev\\pessoal\\BankAccountManagerApi\\database_dev_files");
+            options.UseFileBaseContextDatabase(location: "C:\\Users\\BrunoMatuk\\Documents\\matuk_dev\\BankAccountManagerApi\\database_dev_files");
         });
 
         services.AddScoped<IAccountRepository, AccountRepository>();
         services.AddScoped<ITransactionRepository, TransactionRepository>();
+        services.AddScoped<ITransactionTypeRepository, TransactionTypeRepository>();
     }
 
     private static void AddServices(IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<ITransactionService, TransactionService>();
+        services.AddScoped<ITransactionTypeService, TransactionTypeService>();
     }
 }

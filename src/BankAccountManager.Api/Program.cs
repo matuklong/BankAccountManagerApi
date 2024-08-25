@@ -1,3 +1,4 @@
+using BankAccountManager.Api.Endpoints;
 using BankAccountManager.Domain.Account.Interface;
 using BankAccountManager.Domain.Account.ViewModel;
 using BankAccountManager.Domain.Transaction.Interface;
@@ -16,6 +17,20 @@ builder.Services.AddSwaggerGen();
 var configuration = builder.Configuration;
 builder.Services.AddApiDependecyInjection(configuration);
 
+var MyAllowSpecificOrigins = "Frontend";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      builder =>
+                      {
+                          builder
+                          .WithOrigins("http://localhost:3000")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
+                      });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -25,80 +40,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
 app.UseHttpsRedirection();
 
+app.UseCors(MyAllowSpecificOrigins);
 
-app.MapGet("/account", async ([FromServices] IAccountService accountService) =>
-{
-
-    var accountList = await accountService.GetActiveAccounts();
-
-    if (!accountList.Any())
-        return Results.NotFound();
-
-    return Results.Ok(accountList);
-})
-.WithName("GetAccount")
-.WithOpenApi();
-
-app.MapPost("/account", async ([FromServices] IAccountService accountService, [FromBody] CreateAccountViewModel createAccountViewModel) =>
-{
-
-    var account = await accountService.CreateAccount(createAccountViewModel);
-
-    return Results.Ok(account);
-})
-.WithName("PostAccount")
-.WithOpenApi();
-
-app.MapGet("/transaction", async (
-    [FromServices] ITransactionService transactionService, [FromServices] IAccountService accountService,
-    [FromQuery] int accountId, [FromQuery] DateTime startTransactionDate) =>
-{
-    var account = await accountService.GetById(accountId);
-    if (account == null)
-        return Results.NotFound();
-
-    var transactionList = await transactionService.GetTransactions(account, startTransactionDate);
-
-    return Results.Ok(transactionList);
-})
-.WithName("GetTransaction")
-.WithOpenApi();
-
-app.MapPost("/transaction", async (
-    [FromServices] ITransactionService transactionService, [FromServices] IAccountService accountService,
-    [FromBody] List<CreateTransactionRequestViewModel> createTransactionRequestViewModel) =>
-{
-    var accountId = createTransactionRequestViewModel.FirstOrDefault()?.AccountId;
-    if (accountId == null)
-        return Results.BadRequest();
-
-    var account = await accountService.GetById(accountId.Value);
-    if (account == null)
-        return Results.NotFound();
-
-    var transactionList = await transactionService.CreateTransaction(account, createTransactionRequestViewModel);
-
-    return Results.Ok(transactionList);
-})
-.WithName("PostTransaction")
-.WithOpenApi();
-
-app.MapDelete("/transaction", async (
-    [FromServices] ITransactionService transactionService, [FromServices] IAccountService accountService,
-    [FromQuery] int accountId, [FromQuery] int transactionId) =>
-{
-    var account = await accountService.GetById(accountId);
-    if (account == null)
-        return Results.NotFound();
-
-    await transactionService.DeleteTransaction(account, transactionId);
-
-    return Results.Accepted();
-})
-.WithName("DeleteTransaction")
-.WithOpenApi();
+// Aplication Endpoints
+app.AddAccountEndpoints();
+app.AddTransactionEndpoints();
+app.AddTransactionTypeEndpoints();
 
 app.Run();
 

@@ -8,7 +8,7 @@
     "CreatedAt": "2024-07-09T19:01:32.8919742-03:00",
     "Description": "Balada",
     "TransactionDate": "2024-06-02T00:00:00Z",
-    "TransactionTypeId": null,
+    "TransactionTypeId": 1,
     "TransferenceBetweenAccounts": false
   }
 ]

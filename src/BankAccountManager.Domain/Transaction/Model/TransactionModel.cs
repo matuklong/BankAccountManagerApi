@@ -78,4 +78,10 @@ public class TransactionModel
         TransactionType = transactionType;
         TransactionTypeId = transactionType.Id;
     }
+
+    internal void UpdateTransactionType(TransactionTypeModel transactionType)
+    {
+        this.TransactionType = transactionType;
+        this.TransactionTypeId = transactionType.Id;
+    }
 }

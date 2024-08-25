@@ -14,10 +14,14 @@ public class TransactionService : ITransactionService
 {
     private readonly ITransactionRepository _transactionRepository;
     private readonly IAccountRepository _accountRepository;
-    public TransactionService(ITransactionRepository transactionRepository, IAccountRepository accountRepository)
+    private readonly ITransactionTypeRepository _transactionTypeRepository;
+
+    public TransactionService(ITransactionRepository transactionRepository, IAccountRepository accountRepository,
+        ITransactionTypeRepository transactionTypeRepository)
     {
         _transactionRepository = transactionRepository;
         _accountRepository = accountRepository;
+        _transactionTypeRepository = transactionTypeRepository;
     }
 
     public async Task<List<TransactionModel>> CreateTransaction(AccountModel account, List<CreateTransactionRequestViewModel> createTransactionRequestList)
@@ -99,5 +103,26 @@ public class TransactionService : ITransactionService
         // Save to Database using transaction to ensure Data Consistency
         await _transactionRepository.SaveToDatabase();
 
+    }
+
+
+    public async Task<TransactionModel?> UpdateTransactionType(int transactionId, int transactionTypeId)
+    {
+        var transaction = await _transactionRepository.GetById(transactionId);
+        if (transaction == null)
+            return null;
+
+        var transactionType = await _transactionTypeRepository.GetById(transactionTypeId);
+
+        // var account = await _accountRepository.GetActiveById(createTransactionRequestViewModel.AccountId);
+        if (transactionType == null)
+            return null;
+
+        transaction.UpdateTransactionType(transactionType);
+
+        // Save to Database using transaction to ensure Data Consistency
+        await _transactionRepository.SaveToDatabase();
+
+        return transaction;
     }
 }
