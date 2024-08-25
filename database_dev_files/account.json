@@ -1,8 +1,8 @@
 [
   {
     "Id": 1,
-    "AccountHolder": "341 - Banco Ita\u00FA",
-    "AccountNumber": "7068/00059-0",
+    "AccountHolder": "World Bank",
+    "AccountNumber": "555 / 45890-9",
     "Balance": 10,
     "CreatedAt": "2024-07-09T18:46:33.6965927-03:00",
     "Description": "Conta corrente",
@@ -11,8 +11,8 @@
   },
   {
     "Id": 2,
-    "AccountHolder": "341 - Banco Ita\u00FA",
-    "AccountNumber": "7068/00059-0",
+    "AccountHolder": "World Bank",
+    "AccountNumber": "555 / 45890-9",
     "Balance": 0,
     "CreatedAt": "2024-07-09T18:56:54.0076525-03:00",
     "Description": "Poupan\u00E7a",
