@@ -5,6 +5,7 @@ using BankAccountManager.Domain.Transaction.Model;
 using BankAccountManager.Domain.Transaction.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,33 +34,25 @@ public class TransactionService : ITransactionService
         var resultList = new List<TransactionModel>();
         foreach (var createTransactionRequestViewModel in createTransactionRequestList)
         {
-
-            var transactionAmount = createTransactionRequestViewModel.TransactionAmountType switch
+            if (createTransactionRequestViewModel.Id != null && createTransactionRequestViewModel.Id > 0)
             {
-                TransactionAmountType.TransactionAmount => createTransactionRequestViewModel.Amount,
-                TransactionAmountType.AccountBalance => createTransactionRequestViewModel.Amount - account.Balance,
-                _ => throw new Exception($"Transaction Amount Type {createTransactionRequestViewModel.TransactionAmountType} not supported")
-            };
+                var transactionToUpdate = await _transactionRepository.GetById(createTransactionRequestViewModel.Id.Value);
 
-            // Create Transaction
-            var transaction = new TransactionModel(
-                account,
-                transactionAmount,
-                createTransactionRequestViewModel.Description ?? "",
-                createTransactionRequestViewModel.TransactionDate,
-                DateTime.Now,
-                createTransactionRequestViewModel.CapitalizationEvent,
-                createTransactionRequestViewModel.TransferenceBetweenAccounts
-                );
+                if (transactionToUpdate != null)
+                {
+                    await UpdateTransaction(account, createTransactionRequestViewModel, transactionToUpdate);
 
-            // Update Account Balance
-            account.AddTransaction(transaction);
+                    // Return updated Transactions
+                    resultList.Add(transactionToUpdate);
+                }
+            }
+            else
+            {
+                TransactionModel transaction = await CreateAndAddTransaction(account, createTransactionRequestViewModel);
 
-            // Add Itens to Context
-            _transactionRepository.AddTransaction(transaction);
-
-            // Return created Transactions
-            resultList.Add(transaction);
+                // Return created Transactions
+                resultList.Add(transaction);
+            }
         }
 
         // Save to Database using transaction to ensure Data Consistency
@@ -72,6 +65,70 @@ public class TransactionService : ITransactionService
         return resultList;
     }
 
+    private async Task<TransactionModel> CreateAndAddTransaction(AccountModel account, CreateTransactionRequestViewModel createTransactionRequestViewModel)
+    {
+        var transactionAmount = createTransactionRequestViewModel.TransactionAmountType switch
+        {
+            TransactionAmountType.TransactionAmount => createTransactionRequestViewModel.Amount,
+            TransactionAmountType.AccountBalance => createTransactionRequestViewModel.Amount - account.Balance,
+            _ => throw new Exception($"Transaction Amount Type {createTransactionRequestViewModel.TransactionAmountType} not supported")
+        };
+
+        // Create Transaction
+        var transaction = new TransactionModel(
+            account,
+            transactionAmount,
+            createTransactionRequestViewModel.Description ?? "",
+            createTransactionRequestViewModel.TransactionDate,
+            DateTime.Now,
+            createTransactionRequestViewModel.CapitalizationEvent,
+            createTransactionRequestViewModel.TransferenceBetweenAccounts
+            );
+
+        if (createTransactionRequestViewModel.TransactionTypeId != null)
+        {
+            var transactionType = await _transactionTypeRepository.GetById(createTransactionRequestViewModel.TransactionTypeId.Value);
+            if (transactionType != null)
+                transaction.UpdateTransactionType(transactionType);
+        }
+        else
+            transaction.ClearTransactionType();
+
+        // Update Account Balance
+        account.AddTransaction(transaction);
+
+        // Add Itens to Context
+        _transactionRepository.AddTransaction(transaction);
+        return transaction;
+    }
+
+    private async Task<TransactionModel> UpdateTransaction(AccountModel account, CreateTransactionRequestViewModel createTransactionRequestViewModel, 
+        TransactionModel transaction)
+    {
+        // Amount difference between the new and the old transaction to update account balance
+        var accountAmountDiff = createTransactionRequestViewModel.Amount - transaction.Amount;
+
+        transaction.ChangeTransaction(
+            createTransactionRequestViewModel.Amount,
+            createTransactionRequestViewModel.TransactionDate,
+            createTransactionRequestViewModel.Description ?? "",
+            createTransactionRequestViewModel.CapitalizationEvent,
+            createTransactionRequestViewModel.TransferenceBetweenAccounts
+            );
+
+        if (createTransactionRequestViewModel.TransactionTypeId != null)
+        {
+            var transactionType = await _transactionTypeRepository.GetById(createTransactionRequestViewModel.TransactionTypeId.Value);
+            if (transactionType != null)
+                transaction.UpdateTransactionType(transactionType);
+        }
+        else
+            transaction.ClearTransactionType();
+
+        account.UpdateAmount(accountAmountDiff);
+
+        return transaction;
+    }
 
     public async Task<List<TransactionModel>> GetTransactions(AccountModel account, DateTime startTransactionDate)
     {

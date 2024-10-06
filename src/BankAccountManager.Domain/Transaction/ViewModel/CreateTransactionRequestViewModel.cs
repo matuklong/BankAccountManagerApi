@@ -10,6 +10,7 @@ public enum TransactionAmountType { TransactionAmount, AccountBalance };
 
 public class CreateTransactionRequestViewModel
 {
+    public int? Id { get; set; }
     public int AccountId { get; set; }
     public decimal Amount { get; set; }
     public DateTime TransactionDate { get; set; }
@@ -17,5 +18,6 @@ public class CreateTransactionRequestViewModel
     public bool CapitalizationEvent { get; set; }
     public bool TransferenceBetweenAccounts { get; set; }
     public TransactionAmountType TransactionAmountType { get; set; }
+    public int? TransactionTypeId { get; set; }
 
 }

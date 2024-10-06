@@ -27,7 +27,7 @@ internal class TransactionRepository : ITransactionRepository
         return await 
             _bankAccountContext.transactionModels
             .Where(x => x.AccountId == accountId)
-            .OrderByDescending(x => x.TransactionDate)
+            .OrderByDescending(x => x.TransactionDate).ThenByDescending(x => x.Id)
             .FirstOrDefaultAsync();
     }
 
@@ -37,6 +37,7 @@ internal class TransactionRepository : ITransactionRepository
             _bankAccountContext.transactionModels
             .Include(x => x.TransactionType)
             .Where(x => x.AccountId == accountId && x.TransactionDate >= startTransactionDate.Date)
+            .OrderBy(x => x.TransactionDate).ThenBy(x => x.Id)
             .ToListAsync();
     }
 
@@ -49,6 +50,7 @@ internal class TransactionRepository : ITransactionRepository
             _bankAccountContext.transactionModels
             .Include(x => x.TransactionType)
             .Where(x => x.TransactionDate >= baseDate && !x.TransferenceBetweenAccounts)
+            .OrderBy(x => x.TransactionDate).ThenBy(x => x.Id)
             .ToListAsync();
     }
 
@@ -61,6 +63,7 @@ internal class TransactionRepository : ITransactionRepository
             _bankAccountContext.transactionModels
             .Include(x => x.TransactionType)
             .Where(x => x.AccountId == accountId && x.TransactionDate >= baseDate && !x.TransferenceBetweenAccounts)
+            .OrderBy(x => x.TransactionDate).ThenBy(x => x.Id)
             .ToListAsync();
     }
 
@@ -72,6 +75,8 @@ internal class TransactionRepository : ITransactionRepository
             .Where(x => x.AccountId == accountId 
                 && x.TransactionDate >= startTransactionDate.Date
                 && x.TransactionType == null)
+
+            .OrderBy(x => x.TransactionDate).ThenBy(x => x.Id)
             .ToListAsync();
     }
 

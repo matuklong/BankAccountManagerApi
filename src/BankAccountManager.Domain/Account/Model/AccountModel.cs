@@ -45,4 +45,9 @@ public class AccountModel
     {
         Balance -= transaction.Amount;
     }
+
+    internal void UpdateAmount(decimal accountAmountDiff)
+    {
+        this.Balance += accountAmountDiff;
+    }
 }

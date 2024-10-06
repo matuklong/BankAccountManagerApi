@@ -73,15 +73,15 @@ public class TransactionModel
         TransferenceBetweenAccounts = transferenceBetweenAccounts;
     }
 
-    public void ChangeTransactionType(TransactionTypeModel transactionType)
-    {
-        TransactionType = transactionType;
-        TransactionTypeId = transactionType.Id;
-    }
-
     internal void UpdateTransactionType(TransactionTypeModel transactionType)
     {
         this.TransactionType = transactionType;
         this.TransactionTypeId = transactionType.Id;
+    }
+
+    internal void ClearTransactionType()
+    {
+        this.TransactionType = null;
+        this.TransactionTypeId = null;
     }
 }
