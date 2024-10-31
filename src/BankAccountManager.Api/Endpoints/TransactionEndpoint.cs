@@ -1,7 +1,9 @@
-﻿using BankAccountManager.Domain.Account.Interface;
+﻿using BankAccountManager.Api.Dto;
+using BankAccountManager.Domain.Account.Interface;
 using BankAccountManager.Domain.Account.ViewModel;
 using BankAccountManager.Domain.Transaction.Interface;
 using BankAccountManager.Domain.Transaction.ViewModel;
+using BankAccountManager.Infrastructure.Csv;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BankAccountManager.Api.Endpoints;
@@ -74,6 +76,61 @@ public static class TransactionEndpoint
         .WithName("DeleteTransaction")
         .WithOpenApi();
 
+
+        app.MapPost("/transaction/parse-file", async (
+            [FromServices] ITransactionService transactionService, [FromServices] IAccountService accountService,
+            [FromForm] TransactionFileUploadDto transactionFileUploadDto) =>
+        {
+            if (transactionFileUploadDto == null)
+                return Results.BadRequest();
+
+            if (transactionFileUploadDto.FileUpload == null)
+                return Results.BadRequest();
+
+            var accountId = transactionFileUploadDto?.AccountId;
+            if (accountId == null)
+                return Results.BadRequest();
+
+            var account = await accountService.GetById(accountId.Value);
+            if (account == null)
+                return Results.NotFound();
+
+            await using var stream = transactionFileUploadDto.FileUpload.OpenReadStream();
+            var responseList = await transactionService.ParseCsvFile(account, stream);
+
+            return Results.Ok(responseList);
+        })
+        .WithName("UploadFileParse")
+        .DisableAntiforgery()
+        .WithOpenApi();
+
+
+        app.MapPost("/transaction/upload-file", async (
+            [FromServices] ITransactionService transactionService, [FromServices] IAccountService accountService,
+            [FromForm] TransactionFileUploadDto transactionFileUploadDto) =>
+        {
+            if (transactionFileUploadDto == null)
+                return Results.BadRequest();
+
+            if (transactionFileUploadDto.FileUpload == null)
+                return Results.BadRequest();
+
+            var accountId = transactionFileUploadDto?.AccountId;
+            if (accountId == null)
+                return Results.BadRequest();
+
+            var account = await accountService.GetById(accountId.Value);
+            if (account == null)
+                return Results.NotFound();
+
+            await using var stream = transactionFileUploadDto.FileUpload.OpenReadStream();
+            var responseList = await transactionService.ProcessCsvFile(account, stream);
+
+            return Results.Ok(responseList);
+        })
+        .WithName("UploadFileProcess")
+        .DisableAntiforgery()
+        .WithOpenApi();
 
         return app;
     }

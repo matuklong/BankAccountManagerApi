@@ -29,7 +29,16 @@ public class AccountService: IAccountService
 
     public async Task<AccountModel?> CreateAccount(CreateAccountViewModel createAccountViewModel)
     {
-        var account = AccountModel.Create(createAccountViewModel.AccountNumber, createAccountViewModel.AccountHolder, createAccountViewModel.Description);
+        if (createAccountViewModel == null)
+            throw new ArgumentNullException(nameof(createAccountViewModel));
+
+        if (string.IsNullOrWhiteSpace(createAccountViewModel.AccountNumber))
+            throw new ArgumentException("Account number is required.", nameof(createAccountViewModel.AccountNumber));
+
+        if (string.IsNullOrWhiteSpace(createAccountViewModel.AccountHolder))
+            throw new ArgumentException("Account holder is required.", nameof(createAccountViewModel.AccountHolder));
+
+        var account = AccountModel.Create(createAccountViewModel.AccountNumber, createAccountViewModel.AccountHolder, createAccountViewModel.Description ?? "");
         return await _accountRepository.CreateAccount(account);
     }
 }

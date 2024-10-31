@@ -2,6 +2,7 @@
 using BankAccountManager.Domain.Account.Service;
 using BankAccountManager.Domain.Transaction.Interface;
 using BankAccountManager.Domain.Transaction.Service;
+using BankAccountManager.Infrastructure.Csv;
 using BankAccountManager.Infrastructure.Database;
 using kDg.FileBaseContext.Extensions;
 using Microsoft.Extensions.Configuration;
@@ -40,5 +41,7 @@ public static class ApiDependecyInjection
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<ITransactionService, TransactionService>();
         services.AddScoped<ITransactionTypeService, TransactionTypeService>();
+
+        services.AddScoped<IFileProcessorService, CsvService>();
     }
 }

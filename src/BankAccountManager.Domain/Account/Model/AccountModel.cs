@@ -18,7 +18,7 @@ public class AccountModel
     public DateTime? LastTransactionDate { get; private set; }
     public bool IsActive { get; private set; }
 
-    public static AccountModel Create(string? accountNumber, string? accountHolder, string? description)
+    public static AccountModel Create(string accountNumber, string accountHolder, string description)
     {
         var account = new AccountModel
         {

@@ -9,6 +9,7 @@ using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace BankAccountManager.Domain.Transaction.Service;
 public class TransactionService : ITransactionService
@@ -16,13 +17,15 @@ public class TransactionService : ITransactionService
     private readonly ITransactionRepository _transactionRepository;
     private readonly IAccountRepository _accountRepository;
     private readonly ITransactionTypeRepository _transactionTypeRepository;
+    private readonly IFileProcessorService _fileProcessorService;
 
     public TransactionService(ITransactionRepository transactionRepository, IAccountRepository accountRepository,
-        ITransactionTypeRepository transactionTypeRepository)
+        ITransactionTypeRepository transactionTypeRepository, IFileProcessorService fileProcessorService)
     {
         _transactionRepository = transactionRepository;
         _accountRepository = accountRepository;
         _transactionTypeRepository = transactionTypeRepository;
+        _fileProcessorService = fileProcessorService;
     }
 
     public async Task<List<TransactionModel>> CreateTransaction(AccountModel account, List<CreateTransactionRequestViewModel> createTransactionRequestList)
@@ -181,5 +184,35 @@ public class TransactionService : ITransactionService
         await _transactionRepository.SaveToDatabase();
 
         return transaction;
+    }
+
+    public async Task<List<FileProcessorResponseDto>> ParseCsvFile(AccountModel account, Stream file)
+    {
+        var responseList = await _fileProcessorService.ProcessCsvAsync(file, account, new System.Globalization.CultureInfo("pt-BR"), ";", false);
+
+        // TODO: Find TransactionType by Description
+
+        return responseList;
+    }
+
+    public async Task<List<FileProcessorResponseDto>> ProcessCsvFile(AccountModel account, Stream file)
+    {
+        var responseList = await ParseCsvFile(account, file);
+
+        // TODO: Find TransactionType by Description
+
+        // TODO: Save to DB in batches to avoid overloading memory or too many transactions
+        // Add to memory only. Persist to DB later inside a transaction
+        foreach (var response in responseList)
+        {
+            if (response.Transaction != null)
+                _transactionRepository.AddTransaction(response.Transaction);
+        }
+
+        // Save all at once inside the trasaction
+        // All or nothing
+        await _transactionRepository.SaveToDatabase();
+
+        return responseList;
     }
 }

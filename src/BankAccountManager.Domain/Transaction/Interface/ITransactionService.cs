@@ -15,4 +15,6 @@ public interface ITransactionService
     public Task<List<TransactionModel>> GetTransactions(AccountModel account, DateTime startTransactionDate);
     public Task DeleteTransaction(AccountModel account, int transactionId);
     Task<TransactionModel?> UpdateTransactionType(int transactionId, int transactionTypeId);
+    Task<List<FileProcessorResponseDto>> ParseCsvFile(AccountModel account, Stream file);
+    Task<List<FileProcessorResponseDto>> ProcessCsvFile(AccountModel account, Stream file);
 }
