@@ -6,7 +6,8 @@ CREATE DATABASE BankAccount
 
 
 -- DROP USER 'BankAccountUser'@'%';
-CREATE USER 'BankAccountUser'@'%' IDENTIFIED  WITH mysql_native_password BY 'MySQLPassword';
+-- CREATE USER 'BankAccountUser'@'%' IDENTIFIED  WITH mysql_native_password   BY 'MySQLPassword';
+CREATE USER 'BankAccountUser'@'%' IDENTIFIED   BY 'MySQLPassword';
 
 
 
@@ -58,6 +59,6 @@ CREATE TABLE IF NOT EXISTS Transaction (
 
 
 
-select * from Account;
-select @@version;
-SELECT user, host, plugin from mysql.user WHERE plugin='mysql_native_password';
+-- select * from Account;
+-- select @@version;
+-- SELECT user, host, plugin from mysql.user WHERE plugin='mysql_native_password';
