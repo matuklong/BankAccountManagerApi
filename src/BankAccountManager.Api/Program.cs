@@ -50,5 +50,7 @@ app.AddAccountEndpoints();
 app.AddTransactionEndpoints();
 app.AddTransactionTypeEndpoints();
 
+Console.WriteLine("Starting Bank Account Manager API with configuration: " + builder.Environment.EnvironmentName);
+
 app.Run();
 
