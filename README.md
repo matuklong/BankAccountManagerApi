@@ -16,7 +16,7 @@ Create Database and Create User
 Connect and execute `MySQL-Creation-Script.sql` script
 
 
-### Setting Database connection in secrets
+# appSettings
 
 Enter the API Project folder
 
@@ -27,6 +27,9 @@ Init Secrets
 ```
 dotnet user-secrets init
 ```
+
+### Setting Database connection in secrets
+
 
 Create Database connection entry
 
@@ -39,21 +42,34 @@ Similar to appSettings.json
 	"ConnectionStrings": {
 	  "WebAppDbContext": "Server=localhost;Database=BankAccount;User ID=BankAccountUser;Password=MySQLPassword;"
 	}
-	```
+```
 	
+### Cors
+Alowed origins multiple orgins
 
+```
+dotnet user-secrets set "Cors:AllowedOrigins:0" "http://localhost:3000"
+dotnet user-secrets set "Cors:AllowedOrigins:1" "http://localhost:3001"
+```
+
+```
+Similar to appSettings.json
+	"Cors": {
+	  "AllowedOrigins": ["http://localhost:3000", "http://localhost:3001"]
+	}
+```
 
 # Docker
 
 ## Build
 
 ```
-docker build -f ./src/BankAccountManager.Api/Dockerfile ./ -t matuklong-bankaccountmanager-api:v20250209.4
+docker build -f ./src/BankAccountManager.Api/Dockerfile ./ -t bank-account-manager/api:v20250228.1
 ```
 
 ## Run
 
 > Get local IP from Docker to connect with MySQL. Ex.: ```192.168.1.193```
 ```
-docker run -it -p 8080:8080 -e "ConnectionStrings:MySQL=Server=192.168.1.193;Database=BankAccount;User ID=BankAccountUser;Password=MySQLPassword;" matuklong-bankaccountmanager-api:v20250209.4
+docker run -it -p 8080:8080 -e "ConnectionStrings:MySQL=Server=192.168.1.193;Database=BankAccount;User ID=BankAccountUser;Password=MySQLPassword;" bank-account-manager/api:v20250228.1
 ```
