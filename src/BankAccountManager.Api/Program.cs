@@ -17,19 +17,21 @@ builder.Services.AddSwaggerGen();
 var configuration = builder.Configuration;
 builder.Services.AddApiDependecyInjection(configuration);
 
+var allowedOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
 var MyAllowSpecificOrigins = "Frontend";
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(name: MyAllowSpecificOrigins,
-                      builder =>
-                      {
-                          builder
-                          .WithOrigins("http://localhost:3000")
-                          .AllowAnyHeader()
-                          .AllowAnyMethod()
-                          .AllowCredentials();
-                      });
-});
+if (allowedOrigins != null && allowedOrigins.Length > 0)
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy(name: MyAllowSpecificOrigins,
+                          builder =>
+                          {
+                              builder
+                              .WithOrigins(allowedOrigins)
+                              .AllowAnyHeader()
+                              .AllowAnyMethod()
+                              .AllowCredentials();
+                          });
+    });
 
 var app = builder.Build();
 
@@ -47,6 +49,7 @@ app.UseCors(MyAllowSpecificOrigins);
 
 // Aplication Endpoints
 app.AddAccountEndpoints();
+app.AddHealthCheckEndpoints();
 app.AddTransactionEndpoints();
 app.AddTransactionTypeEndpoints();
 

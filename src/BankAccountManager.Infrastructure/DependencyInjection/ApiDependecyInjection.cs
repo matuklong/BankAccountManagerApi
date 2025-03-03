@@ -29,6 +29,7 @@ public static class ApiDependecyInjection
         });
 
         services.AddScoped<IAccountRepository, AccountRepository>();
+        services.AddScoped<HealthCheckRepository>();
         services.AddScoped<ITransactionRepository, TransactionRepository>();
         services.AddScoped<ITransactionTypeRepository, TransactionTypeRepository>();
     }
