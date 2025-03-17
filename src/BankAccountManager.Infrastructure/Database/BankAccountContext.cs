@@ -17,7 +17,7 @@ public class BankAccountContext: DbContext
     }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        Console.WriteLine("OnConfiguring: " + optionsBuilder.Options);
+        // Console.WriteLine("OnConfiguring: " + optionsBuilder.Options);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

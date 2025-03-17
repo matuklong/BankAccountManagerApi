@@ -9,6 +9,10 @@ using System.Security.Principal;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Docker run -e: Load configuration from env with Prefix BankAccountManager_.
+// https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-9.0#naming-of-environment-variables
+builder.Configuration.AddEnvironmentVariables(prefix: "BankAccountManager_");
+
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -20,6 +24,9 @@ builder.Services.AddApiDependecyInjection(configuration);
 var allowedOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
 var MyAllowSpecificOrigins = "Frontend";
 if (allowedOrigins != null && allowedOrigins.Length > 0)
+{
+    Console.WriteLine($"Adding Cors {MyAllowSpecificOrigins}: {string.Join(';',allowedOrigins)}");
+
     builder.Services.AddCors(options =>
     {
         options.AddPolicy(name: MyAllowSpecificOrigins,
@@ -32,6 +39,8 @@ if (allowedOrigins != null && allowedOrigins.Length > 0)
                               .AllowCredentials();
                           });
     });
+}
+
 
 var app = builder.Build();
 
@@ -40,12 +49,13 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+
+    app.UseHttpsRedirection();
 }
 
-
-app.UseHttpsRedirection();
-
-app.UseCors(MyAllowSpecificOrigins);
+if (allowedOrigins != null && allowedOrigins.Length > 0)
+    app.UseCors(MyAllowSpecificOrigins);
 
 // Aplication Endpoints
 app.AddAccountEndpoints();

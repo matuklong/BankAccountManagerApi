@@ -7,7 +7,7 @@ CREATE DATABASE BankAccount
 
 -- DROP USER 'BankAccountUser'@'%';
 -- CREATE USER 'BankAccountUser'@'%' IDENTIFIED  WITH mysql_native_password   BY 'MySQLPassword';
-CREATE USER 'BankAccountUser'@'%' IDENTIFIED   BY 'MySQLPassword';
+CREATE USER 'BankAccountUser'@'%' IDENTIFIED BY 'MySQLPassword';
 
 
 
