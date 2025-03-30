@@ -10,11 +10,11 @@ namespace BankAccountManager.Api.Endpoints;
 
 public static class TransactionEndpoint
 {
-    public static IEndpointRouteBuilder AddTransactionEndpoints(this IEndpointRouteBuilder app)
+    public static IEndpointRouteBuilder AddTransactionEndpoints(this IEndpointRouteBuilder app, string endpointPrefix)
     {
 
 
-        app.MapGet("/transaction", async (
+        app.MapGet(endpointPrefix + "/transaction", async (
             [FromServices] ITransactionService transactionService, [FromServices] IAccountService accountService,
             [FromQuery] int accountId, [FromQuery] DateTime startTransactionDate) =>
         {
@@ -29,7 +29,7 @@ public static class TransactionEndpoint
         .WithName("GetTransaction")
         .WithOpenApi();
 
-        app.MapPost("/transaction", async (
+        app.MapPost(endpointPrefix + "/transaction", async (
             [FromServices] ITransactionService transactionService, [FromServices] IAccountService accountService,
             [FromBody] List<CreateTransactionRequestViewModel> createTransactionRequestViewModel) =>
         {
@@ -48,7 +48,7 @@ public static class TransactionEndpoint
         .WithName("PostTransaction")
         .WithOpenApi();
 
-        app.MapPost("/transaction/{transactionId}/type/{transactionTypeId}", async (
+        app.MapPost(endpointPrefix + "/transaction/{transactionId}/type/{transactionTypeId}", async (
             [FromServices] ITransactionService transactionService, [FromServices] IAccountService accountService,
             int transactionId, int transactionTypeId) =>
         {
@@ -61,7 +61,7 @@ public static class TransactionEndpoint
         .WithName("UpdateTransactionType")
         .WithOpenApi();
 
-        app.MapDelete("/transaction", async (
+        app.MapDelete(endpointPrefix + "/transaction", async (
             [FromServices] ITransactionService transactionService, [FromServices] IAccountService accountService,
             [FromQuery] int accountId, [FromQuery] int transactionId) =>
         {
@@ -77,7 +77,7 @@ public static class TransactionEndpoint
         .WithOpenApi();
 
 
-        app.MapPost("/transaction/parse-file", async (
+        app.MapPost(endpointPrefix + "/transaction/parse-file", async (
             [FromServices] ITransactionService transactionService, [FromServices] IAccountService accountService,
             [FromForm] TransactionFileUploadDto transactionFileUploadDto) =>
         {
@@ -105,7 +105,7 @@ public static class TransactionEndpoint
         .WithOpenApi();
 
 
-        app.MapPost("/transaction/upload-file", async (
+        app.MapPost(endpointPrefix + "/transaction/upload-file", async (
             [FromServices] ITransactionService transactionService, [FromServices] IAccountService accountService,
             [FromForm] TransactionFileUploadDto transactionFileUploadDto) =>
         {

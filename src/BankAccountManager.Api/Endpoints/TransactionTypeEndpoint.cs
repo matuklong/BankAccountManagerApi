@@ -8,10 +8,10 @@ namespace BankAccountManager.Api.Endpoints;
 
 public static class TransactionTypeEndpoint
 {
-    public static IEndpointRouteBuilder AddTransactionTypeEndpoints(this IEndpointRouteBuilder app)
+    public static IEndpointRouteBuilder AddTransactionTypeEndpoints(this IEndpointRouteBuilder app, string endpointPrefix)
     {
 
-        app.MapGet("/transaction-type", async (
+        app.MapGet(endpointPrefix + "/transaction-type", async (
             [FromServices] ITransactionTypeService transactionTypeService,
             [FromQuery] int? transactionTypeId) =>
         {
@@ -22,7 +22,7 @@ public static class TransactionTypeEndpoint
         .WithName("GetTransactionType")
         .WithOpenApi();
 
-        app.MapPost("/transaction-type", async (
+        app.MapPost(endpointPrefix + "/transaction-type", async (
             [FromServices] ITransactionTypeService transactionTypeService,
             [FromBody] CreateTransactionTypeRequestViewModel createTransactionTypeRequestViewModel) =>
         {
@@ -36,7 +36,7 @@ public static class TransactionTypeEndpoint
         .WithName("PostTransactionType")
         .WithOpenApi();
 
-        app.MapPut("/transaction-type/{transactionTypeId}", async (
+        app.MapPut(endpointPrefix + "/transaction-type/{transactionTypeId}", async (
             [FromServices] ITransactionTypeService transactionTypeService,
             [FromBody] CreateTransactionTypeRequestViewModel createTransactionTypeRequestViewModel,
             [FromRoute] int? transactionTypeId) =>

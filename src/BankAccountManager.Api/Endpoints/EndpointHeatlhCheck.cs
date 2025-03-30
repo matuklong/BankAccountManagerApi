@@ -8,10 +8,10 @@ namespace BankAccountManager.Api.Endpoints;
 
 public static class HealthCheckEndpoint
 {
-    public static IEndpointRouteBuilder AddHealthCheckEndpoints(this IEndpointRouteBuilder app)
+    public static IEndpointRouteBuilder AddHealthCheckEndpoints(this IEndpointRouteBuilder app, string endpointPrefix)
     {
 
-        app.MapGet("/healthcheck", async ([FromServices] HealthCheckRepository healthCheckRepository, CancellationToken cancellationToken) =>
+        app.MapGet(endpointPrefix + "/healthcheck", async ([FromServices] HealthCheckRepository healthCheckRepository, CancellationToken cancellationToken) =>
         {
             // wait 2 seconds for the healthcheck to complete
             var healthCheckResult = await healthCheckRepository.CheckConnectivity(2, cancellationToken);

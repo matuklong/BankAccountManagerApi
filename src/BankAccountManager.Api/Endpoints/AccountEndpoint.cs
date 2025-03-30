@@ -8,10 +8,10 @@ namespace BankAccountManager.Api.Endpoints;
 
 public static class AccountEndpoint
 {
-    public static IEndpointRouteBuilder AddAccountEndpoints(this IEndpointRouteBuilder app)
+    public static IEndpointRouteBuilder AddAccountEndpoints(this IEndpointRouteBuilder app, string endpointPrefix)
     {
 
-        app.MapGet("/account", async ([FromServices] IAccountService accountService,
+        app.MapGet(endpointPrefix + "/account", async ([FromServices] IAccountService accountService,
             [FromQuery] int? accountId) =>
         {
             if (accountId != null)
@@ -36,7 +36,7 @@ public static class AccountEndpoint
         .WithName("GetAccountList")
         .WithOpenApi();
 
-        app.MapPost("/account", async ([FromServices] IAccountService accountService, [FromBody] CreateAccountViewModel createAccountViewModel) =>
+        app.MapPost(endpointPrefix + "/account", async ([FromServices] IAccountService accountService, [FromBody] CreateAccountViewModel createAccountViewModel) =>
         {
 
             var account = await accountService.CreateAccount(createAccountViewModel);

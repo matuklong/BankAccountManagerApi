@@ -58,10 +58,11 @@ if (allowedOrigins != null && allowedOrigins.Length > 0)
     app.UseCors(MyAllowSpecificOrigins);
 
 // Aplication Endpoints
-app.AddAccountEndpoints();
-app.AddHealthCheckEndpoints();
-app.AddTransactionEndpoints();
-app.AddTransactionTypeEndpoints();
+var endpointPrefix = "/api";
+app.AddAccountEndpoints(endpointPrefix);
+app.AddHealthCheckEndpoints(endpointPrefix);
+app.AddTransactionEndpoints(endpointPrefix);
+app.AddTransactionTypeEndpoints(endpointPrefix);
 
 Console.WriteLine("Starting Bank Account Manager API with configuration: " + builder.Environment.EnvironmentName);
 
