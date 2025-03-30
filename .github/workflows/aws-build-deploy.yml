@@ -31,13 +31,13 @@ on:
     branches: [ "main" ]
 
 env:
-  AWS_REGION: ${{ env.MY_AWS_REGION }}                   # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: ${{ env.MY_ECR_REPOSITORY }}           # set this to your Amazon ECR repository name
-  ECS_SERVICE: ${{ env.MY_ECS_SERVICE }}                 # set this to your Amazon ECS service name
-  ECS_CLUSTER: ${{ env.MY_ECS_CLUSTER }}                 # set this to your Amazon ECS cluster name
-  ECS_TASK_DEFINITION: ${{ env.MY_ECS_TASK_DEFINITION }} # set this to the path to your Amazon ECS task definition
+  AWS_REGION: us-east-1                   # set this to your preferred AWS region, e.g. us-west-1
+  ECR_REPOSITORY: 660165626870.dkr.ecr.us-east-1.amazonaws.com/bank-account-manager/api           # set this to your Amazon ECR repository name
+  ECS_SERVICE: bank-account-manager-api-production                # set this to your Amazon ECS service name
+  ECS_CLUSTER: main-ecs-ECSCluster-VGSio72br6uv                 # set this to your Amazon ECS cluster name
+  ECS_TASK_DEFINITION: bank-account-manager-api-production # set this to the path to your Amazon ECS task definition
                                                # file, e.g. .aws/task-definition.json
-  CONTAINER_NAME: ${{ env.MY_CONTAINER_NAME }}           # set this to the name of the container in the
+  CONTAINER_NAME: bank-account-manager-api-production           # set this to the name of the container in the
                                                # containerDefinitions section of your task definition
 
 permissions:
