@@ -62,7 +62,6 @@ select count(*) as Qtty, sum(id) as sum, sum(balance) balance, 'BankAccountProdu
 select count(*) as Qtty, sum(ID_CONTA) as sum, sum(SALDO) balance, 'BankOld.CONTAS' as tablename from BankOld.CONTAS
 ;
 
-
 select count(*) as Qtty, sum(id) as sum, sum(amount) amount, 'BankAccountProduction.Transaction' as tablename from BankAccountProduction.Transaction 
 union
 select count(*) as Qtty, sum(ID_MOVIMENTO) as sum, sum(ROUND(VALOR, 2)) amount, 'BankOld.MOVIMENTO' as tablename from BankOld.MOVIMENTO 
