@@ -36,10 +36,10 @@ select * from BankOld.MOVIMENTO;
 
 -- select * from information_schema.COLUMNS where TABLE_NAME = 'Transaction';
 
-insert into BankAccountProduction.Transaction
-(id, account_id, transaction_type_id, 
-amount, created_at, transaction_date, description, 
-capitalization_event, balance_at_before_transaction, transference_between_accounts)
+-- insert into BankAccountProduction.Transaction
+-- (id, account_id, transaction_type_id, 
+-- amount, created_at, transaction_date, description, 
+-- capitalization_event, balance_at_before_transaction, transference_between_accounts)
 select ID_MOVIMENTO, ID_CONTA, ID_TIPO_MOVIMENTO, 
   ROUND(VALOR, 2) VALOR, DT_INC, DT_MOVIMENTO, DESCRICAO,
   CAPITALIZACAO, IFNULL(SALDO_NO_MOVIMENTO, 0) SALDO_NO_MOVIMENTO, TRANSFERENCIA_CONTA
