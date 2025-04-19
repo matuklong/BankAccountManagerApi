@@ -45,3 +45,40 @@ select ID_MOVIMENTO, ID_CONTA, ID_TIPO_MOVIMENTO,
   CAPITALIZACAO, IFNULL(SALDO_NO_MOVIMENTO, 0) SALDO_NO_MOVIMENTO, TRANSFERENCIA_CONTA
 from BankOld.MOVIMENTO;
 
+
+
+-- --------------------------------------------------------------------------
+-- Validations
+
+
+select count(*) as Qtty, sum(id) as sum, 'BankAccountProduction.TransactionType' as tablename from BankAccountProduction.TransactionType union
+select count(*) as Qtty, sum(ID_TIPO_MOVIMENTO) as sum, 'BankOld.TIPO_MOVIMENTO' as tablename from BankOld.TIPO_MOVIMENTO union
+select count(*) as Qtty, sum(id) as sum, 'BankAccountProduction.TransactionTypeIdentificator' as tablename from BankAccountProduction.TransactionTypeIdentificator union
+select count(*) as Qtty, sum(ID_IDENTIFICACAO_MOVIMENTO) as sum, 'BankOld.IDENTIFICACAO_MOVIMENTO' as tablename from BankOld.IDENTIFICACAO_MOVIMENTO
+;
+
+
+select count(*) as Qtty, sum(id) as sum, sum(balance) balance, 'BankAccountProduction.Account' as tablename from BankAccountProduction.Account union
+select count(*) as Qtty, sum(ID_CONTA) as sum, sum(SALDO) balance, 'BankOld.CONTAS' as tablename from BankOld.CONTAS
+;
+
+
+select count(*) as Qtty, sum(id) as sum, sum(amount) amount, 'BankAccountProduction.Transaction' as tablename from BankAccountProduction.Transaction 
+union
+select count(*) as Qtty, sum(ID_MOVIMENTO) as sum, sum(ROUND(VALOR, 2)) amount, 'BankOld.MOVIMENTO' as tablename from BankOld.MOVIMENTO 
+;
+
+
+select *
+from (
+    select year(transaction_date) y, month(transaction_date) m, count(*) as Qtty, sum(id) as sum, sum(amount) amount, 'BankAccountProduction.Transaction' as tablename from BankAccountProduction.Transaction 
+    group by year(transaction_date), month(transaction_date)
+    ) a
+join (
+    select year(DT_MOVIMENTO) y, month(DT_MOVIMENTO) m, count(*) as Qtty, sum(ID_MOVIMENTO) as sum, sum(ROUND(VALOR, 2)) amount, 'BankOld.MOVIMENTO' as tablename from BankOld.MOVIMENTO 
+    group by year(DT_MOVIMENTO), month(DT_MOVIMENTO)
+    ) b 
+    on a.y = b.y and a.m = b.m
+
+order by a.y, a.m
+;
