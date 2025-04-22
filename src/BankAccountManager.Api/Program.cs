@@ -6,6 +6,7 @@ using BankAccountManager.Domain.Transaction.ViewModel;
 using BankAccountManager.Infrastructure.DependencyInjection;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Principal;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,8 @@ builder.Services.AddSwaggerGen();
 
 var configuration = builder.Configuration;
 builder.Services.AddApiDependecyInjection(configuration);
+
+builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options => options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
 var allowedOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
 var MyAllowSpecificOrigins = "Frontend";

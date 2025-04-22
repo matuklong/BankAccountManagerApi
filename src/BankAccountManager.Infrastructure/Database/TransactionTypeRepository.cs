@@ -19,7 +19,7 @@ internal class TransactionTypeRepository : ITransactionTypeRepository
 
     public async Task<List<TransactionTypeModel>> GetAll()
     {
-        return await _bankAccountContext.transactionTypes.Include(x => x.TransactionTypeString).ToListAsync();
+        return await _bankAccountContext.transactionTypes.Include(x => x.TransactionTypeString).OrderBy(x => x.TransactionType).ThenBy(x => x.Id).ToListAsync();
     }
 
     public async Task<TransactionTypeModel?> GetById(int transactionTypeId)

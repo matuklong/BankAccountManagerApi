@@ -132,6 +132,28 @@ public static class TransactionEndpoint
         .DisableAntiforgery()
         .WithOpenApi();
 
+
+
+        app.MapPost(endpointPrefix + "/transaction/reprocess-undefined-types", async (
+            [FromServices] ITransactionService transactionService, [FromServices] IAccountService accountService,
+            [FromBody] TransactionReprocesUndefinedTypesDto transactionReprocesUndefinedTypesDto) =>
+        {
+            if (transactionReprocesUndefinedTypesDto?.AccountId == null || transactionReprocesUndefinedTypesDto?.startTransactionDate == null)
+                return Results.BadRequest();
+
+            var account = await accountService.GetById(transactionReprocesUndefinedTypesDto.AccountId);
+            if (account == null)
+                return Results.NotFound();
+
+            var result = await transactionService.ReprocessUndefinedTypes(account, transactionReprocesUndefinedTypesDto.startTransactionDate);
+            if (!result)
+                return Results.BadRequest();
+
+            return Results.Ok();
+        })
+        .WithName("ReprocessUndefinedTypes")
+        .WithOpenApi();
+
         return app;
     }
 }

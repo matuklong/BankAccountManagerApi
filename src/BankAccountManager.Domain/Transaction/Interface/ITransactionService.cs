@@ -17,4 +17,5 @@ public interface ITransactionService
     Task<TransactionModel?> UpdateTransactionType(int transactionId, int transactionTypeId);
     Task<List<FileProcessorResponseDto>> ParseCsvFile(AccountModel account, Stream file);
     Task<List<FileProcessorResponseDto>> ProcessCsvFile(AccountModel account, Stream file);
+    Task<bool> ReprocessUndefinedTypes(AccountModel account, DateTime startTransactionDate);
 }

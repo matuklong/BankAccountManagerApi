@@ -6,7 +6,9 @@ using BankAccountManager.Domain.Transaction.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
+using System.Data.Common;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using System.Transactions;
@@ -95,7 +97,10 @@ public class TransactionService : ITransactionService
                 transaction.UpdateTransactionType(transactionType);
         }
         else
-            transaction.ClearTransactionType();
+        {
+            List<TransactionTypeIdentificatorModel> transactionIdentificationList = await GetTransactionTypeIdentificatorList();
+            transaction.IdentifyAndSetTransactionType(transactionIdentificationList);
+        }
 
         // Update Account Balance
         account.AddTransaction(transaction);
@@ -190,7 +195,17 @@ public class TransactionService : ITransactionService
     {
         var responseList = await _fileProcessorService.ProcessCsvAsync(file, account, new System.Globalization.CultureInfo("pt-BR"), ";", false);
 
+        var transactionIdentificationList = await GetTransactionTypeIdentificatorList();
+
         // TODO: Find TransactionType by Description
+        foreach (var response in responseList)
+        {
+            if (response.Transaction != null)
+            {
+                if (response.Transaction.TransactionType == null)
+                    response.Transaction.IdentifyAndSetTransactionType(transactionIdentificationList);
+            }
+        }
 
         return responseList;
     }
@@ -199,14 +214,20 @@ public class TransactionService : ITransactionService
     {
         var responseList = await ParseCsvFile(account, file);
 
-        // TODO: Find TransactionType by Description
+        var transactionIdentificationList = await GetTransactionTypeIdentificatorList();
+
 
         // TODO: Save to DB in batches to avoid overloading memory or too many transactions
         // Add to memory only. Persist to DB later inside a transaction
         foreach (var response in responseList)
         {
             if (response.Transaction != null)
+            {
+                if (response.Transaction.TransactionType == null)
+                    response.Transaction.IdentifyAndSetTransactionType(transactionIdentificationList);
+
                 _transactionRepository.AddTransaction(response.Transaction);
+            }
         }
 
         // Save all at once inside the trasaction
@@ -214,5 +235,34 @@ public class TransactionService : ITransactionService
         await _transactionRepository.SaveToDatabase();
 
         return responseList;
+    }
+
+    public async Task<bool> ReprocessUndefinedTypes(AccountModel account, DateTime startTransactionDate)
+    {
+        var transactionList = await _transactionRepository.GetFromTransactionDateByAccountId(account.Id, startTransactionDate);
+
+        var transactionIdentificationList = await GetTransactionTypeIdentificatorList();
+
+        // TODO: Save to DB in batches to avoid overloading memory or too many transactions
+        // Add to memory only. Persist to DB later inside a transaction
+        foreach (var transaction in transactionList)
+        {
+            if (transaction.TransactionType != null)
+                continue;
+
+            transaction.IdentifyAndSetTransactionType(transactionIdentificationList);
+        }
+
+        // Save all at once inside the trasaction
+        // All or nothing
+        await _transactionRepository.SaveToDatabase();
+
+        return true;
+    }
+
+    private async Task<List<TransactionTypeIdentificatorModel>> GetTransactionTypeIdentificatorList()
+    {
+        var transactionTypeList = await _transactionTypeRepository.GetAll();
+        return transactionTypeList.SelectMany(x => x.TransactionTypeString).OrderBy(x => x.Id).ToList();
     }
 }

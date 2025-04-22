@@ -84,4 +84,38 @@ public class TransactionModel
         this.TransactionType = null;
         this.TransactionTypeId = null;
     }
+
+    internal void IdentifyAndSetTransactionType(List<TransactionTypeIdentificatorModel> transactionIdentification)
+    {
+        var transactionTypeIdentificator = IdentifyTransactionType(transactionIdentification, Description, Amount);
+        if (transactionTypeIdentificator != null)
+            this.UpdateTransactionType(transactionTypeIdentificator.TransactionType);
+    }
+
+    internal TransactionTypeIdentificatorModel? IdentifyTransactionType(List<TransactionTypeIdentificatorModel> transactionIdentification, string description, decimal amount)
+    {
+        description = description.Trim();
+        while (description.IndexOf("  ") >= 0)
+            description = description.Replace("  ", " ");
+
+        foreach(var item in transactionIdentification)
+        {
+            if (item.Description == null)
+                continue;
+
+            if (item.ExpectedAmount == null || item.ExpectedAmount == amount)
+            {
+                if (item.Description.Length > 1 && description.Trim().Contains(item.Description.Trim(), StringComparison.InvariantCultureIgnoreCase))
+                    return item;
+
+                if (item.Description.Length > 1 && item.Description.Trim().Contains(description.Trim(), StringComparison.InvariantCultureIgnoreCase))
+                    return item;
+
+                if (item.Description.Length == 1 && description.Trim().Equals(item.Description?.Trim(), StringComparison.InvariantCultureIgnoreCase))
+                    return item;
+            }
+        }
+
+        return null;
+    }
 }
