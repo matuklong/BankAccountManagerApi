@@ -66,7 +66,8 @@ select count(*) as Qtty, sum(id) as sum, sum(amount) amount, 'BankAccountProduct
 union
 select count(*) as Qtty, sum(ID_MOVIMENTO) as sum, sum(ROUND(VALOR, 2)) amount, 'BankOld.MOVIMENTO' as tablename from BankOld.MOVIMENTO 
 ;
-
+-- 253459678	205084,47
+-- 253459678	205084.4700
 
 select *
 from (
@@ -80,4 +81,19 @@ join (
     on a.y = b.y and a.m = b.m
 
 order by a.y, a.m
+;
+
+
+
+select m.ID_TIPO_MOVIMENTO, t.transaction_type_id, tt.transaction_type, t.*, m.*
+from BankAccountProduction.Transaction t
+left join BankOld.MOVIMENTO m
+  on m.DT_MOVIMENTO = t.transaction_date AND m.DESCRICAO = t.description and m.VALOR = t.amount
+left join TransactionType tt on t.transaction_type_id = tt.id
+where (
+    m.ID_TIPO_MOVIMENTO <> t.transaction_type_id
+    or ( m.ID_TIPO_MOVIMENTO is null and t.transaction_type_id is not null)
+    or ( m.ID_TIPO_MOVIMENTO is not null and t.transaction_type_id is null)
+)
+  and t.transaction_date >= '2025-02-01'
 ;
