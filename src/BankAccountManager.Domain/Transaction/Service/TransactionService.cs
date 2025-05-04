@@ -84,7 +84,7 @@ public class TransactionService : ITransactionService
             account,
             transactionAmount,
             createTransactionRequestViewModel.Description ?? "",
-            createTransactionRequestViewModel.TransactionDate,
+            createTransactionRequestViewModel.TransactionDate.Date,
             DateTime.Now,
             createTransactionRequestViewModel.CapitalizationEvent,
             createTransactionRequestViewModel.TransferenceBetweenAccounts
@@ -118,7 +118,7 @@ public class TransactionService : ITransactionService
 
         transaction.ChangeTransaction(
             createTransactionRequestViewModel.Amount,
-            createTransactionRequestViewModel.TransactionDate,
+            createTransactionRequestViewModel.TransactionDate.Date,
             createTransactionRequestViewModel.Description ?? "",
             createTransactionRequestViewModel.CapitalizationEvent,
             createTransactionRequestViewModel.TransferenceBetweenAccounts
