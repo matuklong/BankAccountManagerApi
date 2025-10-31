@@ -10,5 +10,5 @@ using System.Threading.Tasks;
 namespace BankAccountManager.Domain.Transaction.Service;
 public interface IFileProcessorService
 {
-    Task<List<FileProcessorResponseDto>> ProcessCsvAsync(Stream stream, AccountModel account, CultureInfo cultureInfo, string delimiter, bool hasHeaderRecord);
+    Task<FileProcessorResponseDto> ProcessCsvAsync(Stream stream, AccountModel account, CultureInfo cultureInfo, string delimiter, bool hasHeaderRecord);
 }

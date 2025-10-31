@@ -191,42 +191,42 @@ public class TransactionService : ITransactionService
         return transaction;
     }
 
-    public async Task<List<FileProcessorResponseDto>> ParseCsvFile(AccountModel account, Stream file)
+    public async Task<FileProcessorResponseDto> ParseCsvFile(AccountModel account, Stream file)
     {
-        var responseList = await _fileProcessorService.ProcessCsvAsync(file, account, new System.Globalization.CultureInfo("pt-BR"), ";", false);
+        var response = await _fileProcessorService.ProcessCsvAsync(file, account, new System.Globalization.CultureInfo("pt-BR"), ";", false);
 
         var transactionIdentificationList = await GetTransactionTypeIdentificatorList();
 
         // TODO: Find TransactionType by Description
-        foreach (var response in responseList)
+        foreach (var responseLine in response.Items)
         {
-            if (response.Transaction != null)
+            if (responseLine.Transaction != null)
             {
-                if (response.Transaction.TransactionType == null)
-                    response.Transaction.IdentifyAndSetTransactionType(transactionIdentificationList);
+                if (responseLine.Transaction.TransactionType == null)
+                    responseLine.Transaction.IdentifyAndSetTransactionType(transactionIdentificationList);
             }
         }
 
-        return responseList;
+        return response;
     }
 
-    public async Task<List<FileProcessorResponseDto>> ProcessCsvFile(AccountModel account, Stream file)
+    public async Task<FileProcessorResponseDto> ProcessCsvFile(AccountModel account, Stream file)
     {
-        var responseList = await ParseCsvFile(account, file);
+        var response = await ParseCsvFile(account, file);
 
         var transactionIdentificationList = await GetTransactionTypeIdentificatorList();
 
 
         // TODO: Save to DB in batches to avoid overloading memory or too many transactions
         // Add to memory only. Persist to DB later inside a transaction
-        foreach (var response in responseList)
+        foreach (var responseLine in response.Items)
         {
-            if (response.Transaction != null)
+            if (responseLine.Transaction != null)
             {
-                if (response.Transaction.TransactionType == null)
-                    response.Transaction.IdentifyAndSetTransactionType(transactionIdentificationList);
+                if (responseLine.Transaction.TransactionType == null)
+                    responseLine.Transaction.IdentifyAndSetTransactionType(transactionIdentificationList);
 
-                _transactionRepository.AddTransaction(response.Transaction);
+                _transactionRepository.AddTransaction(responseLine.Transaction);
             }
         }
 
@@ -234,7 +234,7 @@ public class TransactionService : ITransactionService
         // All or nothing
         await _transactionRepository.SaveToDatabase();
 
-        return responseList;
+        return response;
     }
 
     public async Task<bool> ReprocessUndefinedTypes(AccountModel account, DateTime startTransactionDate)

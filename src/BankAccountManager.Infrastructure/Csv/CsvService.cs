@@ -16,7 +16,7 @@ namespace BankAccountManager.Infrastructure.Csv;
 public class CsvService : IFileProcessorService
 {
 
-    public async Task<List<FileProcessorResponseDto>> ProcessCsvAsync(Stream stream, AccountModel account, CultureInfo cultureInfo, string delimiter, bool hasHeaderRecord)
+    public async Task<FileProcessorResponseDto> ProcessCsvAsync(Stream stream, AccountModel account, CultureInfo cultureInfo, string delimiter, bool hasHeaderRecord)
     {
         // CultureInfo.GetCultureInfo("pt-BR")
         var csvConfiguration = new CsvHelper.Configuration.CsvConfiguration(cultureInfo)
@@ -25,7 +25,7 @@ public class CsvService : IFileProcessorService
             HasHeaderRecord = hasHeaderRecord, // false,  // No header in the CSV
         };
 
-        var responseList = new List<FileProcessorResponseDto>();
+        var response = new FileProcessorResponseDto();
         using (var reader = new StreamReader(stream))
         using (var csv = new CsvReader(reader, csvConfiguration)) // Using CsvHelper library
         {
@@ -43,13 +43,13 @@ public class CsvService : IFileProcessorService
 
                     if (record == null)
                     {
-                        responseList.Add(new FileProcessorResponseDto (csv.Parser.Row, "Could not read line.", csv.Parser.RawRecord));
+                        response.Items.Add(new FileProcessorLineResponseDto(csv.Parser.Row, "Could not read line.", csv.Parser.RawRecord));
                         continue;
                     }
 
                     if (!record.Amount.HasValue || !record.TransactionDate.HasValue)
                     {
-                        responseList.Add(new FileProcessorResponseDto(csv.Parser.Row, $"Missing or could not parse required fields {nameof(record.Amount)} or {nameof(record.TransactionDate)}", csv.Parser.RawRecord));
+                        response.Items.Add(new FileProcessorLineResponseDto(csv.Parser.Row, $"Missing or could not parse required fields {nameof(record.Amount)} or {nameof(record.TransactionDate)}", csv.Parser.RawRecord));
                         continue;
                     }
 
@@ -57,7 +57,7 @@ public class CsvService : IFileProcessorService
 
                     account.AddTransaction(transaction);
 
-                    responseList.Add(new FileProcessorResponseDto(csv.Parser.Row, record, csv.Parser.RawRecord, transaction));
+                    response.Items.Add(new FileProcessorLineResponseDto(csv.Parser.Row, record, csv.Parser.RawRecord, transaction));
 
                 }
                 catch (Exception ex)
@@ -67,12 +67,14 @@ public class CsvService : IFileProcessorService
                     // Optionally, you could log the specific line that caused the issue
                     var problematicLine = string.Join(",", csv.Parser.RawRecord); // Raw line as a string
 
-                    responseList.Add(new FileProcessorResponseDto(csv.Parser.Row, errorMessage, csv.Parser.RawRecord));
+                    response.Items.Add(new FileProcessorLineResponseDto(csv.Parser.Row, errorMessage, csv.Parser.RawRecord));
 
                 }
             }
         }
 
-        return responseList;
+        response.AccountBalance = account.Balance;
+
+        return response;
     }
 }
